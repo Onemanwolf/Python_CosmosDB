@@ -18,11 +18,7 @@ class Repository:
 
     def create(self, employee):
 
-        employee_document =  {
-                               "id": employee.id,
-                               "name": employee.name,
-                               "age": employee.age
-                              }
+        
         PartitionKey = employee.id
         #value = container.read_item(item=employee.id, partition_key=PartitionKey)
         employee_exist = container.read_all_items()
@@ -30,7 +26,7 @@ class Repository:
             if item['id'] == employee.id:
                  print("Document already exists")
                  return
-        container.create_item(body=employee_document)
+        container.create_item(body=employee.__dict__)
 
         print("Document inserted successfully!")
     def read(self):
@@ -41,12 +37,8 @@ class Repository:
         return self.data
 
     def update(self, id, employee):
-        employee_document =  {
-                               "id": employee.id,
-                               "name": employee.name,
-                               "age": employee.age
-                              }
-        container.replace_item(item=employee.id, body=employee_document)
+
+        container.replace_item(item=employee.id, body=employee.__dict__)
         print("Document updated successfully!")
 
     def delete(self, id):
