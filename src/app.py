@@ -36,7 +36,7 @@ document = {
 # print("Document inserted successfully!")
 repo = Repository()
 
-repo.create(Employee("emp033", " ", 55))
+repo.create(Employee("emp035", "Joyce Wise ", 80))
 repo.update("emp010", Employee("emp010", "Tim Oleson", 54))
 employee = repo.read_by_id("emp010")
 print(employee)

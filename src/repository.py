@@ -1,44 +1,46 @@
 from azure.cosmos import CosmosClient, PartitionKey
-import os
-endpoint = os.getenv('END_POINT', 'END_POINT')
-key = os.getenv('KEY', 'KEY')
-database_name = os.getenv('DATABASE_NAME', 'END_POINT')
-container_name = os.getenv('CONTAINER_NAME', 'END_POINT')
-client = CosmosClient(endpoint, key)
-client.create_database_if_not_exists(database_name)
-database = client.get_database_client(database_name)
-container = database.get_container_client(container_name)
-import json
-from spec import EmployeeSpec
-employee_spec = EmployeeSpec()
+from config import CONFIG
+from spec import EmployeeSpecification
+
+
 class Repository:
     def __init__(self):
+        self.employee_spec = EmployeeSpecification()
+        self.config = CONFIG()
+        self.endpoint = self.config.endpoint
+        self.key = self.config.key
+        self.database_name = self.config.database_name
+        self.container_name = self.config.container_name
+        self.client = CosmosClient(self.endpoint, self.key)
+        self.create_database = self.client.create_database_if_not_exists(
+            self.database_name
+        )
+        self.database = self.client.get_database_client(self.database_name)
+        self.create_container = self.database.create_container_if_not_exists(
+            id=self.container_name, partition_key=PartitionKey(path="/id")
+        )
+        self.container = self.database.get_container_client(self.container_name)
+
         self.data = []
-
-        # Create a Cosmos DB client
-
 
     def read_by_id(self, id):
         try:
-            document = container.read_item(item=id, partition_key=id)
+            document = self.container.read_item(item=id, partition_key=id)
             return document
         except:
             print("Document does not exist")
             pass
 
-
-
     def create(self, employee):
-
-        employee_exist = container.read_all_items()
+        employee_exist = self.container.read_all_items()
         for item in employee_exist:
-            if item['id'] == employee.id:
-                 print("Document already exists")
-                 return
+            if item["id"] == employee.id:
+                print("Document already exists")
+                return
         try:
-            if employee_spec.isSatifiesBy(employee):
-               container.create_item(body=employee.__dict__)
-               print("Document inserted successfully!")
+            if self.employee_spec.isSatifiesBy(employee):
+                self.container.create_item(body=employee.__dict__)
+                print("Document inserted successfully!")
             else:
                 print("Invalid document")
                 return
@@ -50,7 +52,7 @@ class Repository:
         return
 
     def read(self):
-        data = container.read_all_items()
+        data = self.container.read_all_items()
         for item in data:
             self.data.append(item)
             print(item)
@@ -58,17 +60,14 @@ class Repository:
 
     def update(self, id, employee):
         try:
-            container.replace_item(item=id, body=employee.__dict__)
+            self.container.replace_item(item=id, body=employee.__dict__)
             print("Document updated successfully!")
         except:
             print("Document does not exist")
 
-
     def delete(self, id):
         try:
-            container.delete_item(id,id)
+            self.container.delete_item(id, id)
             print("Document deleted successfully!")
         except:
             print("Document does not exist")
-
-
