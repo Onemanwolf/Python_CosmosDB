@@ -9,7 +9,8 @@ client.create_database_if_not_exists(database_name)
 database = client.get_database_client(database_name)
 container = database.get_container_client(container_name)
 import json
-
+from spec import EmployeeSpec
+employee_spec = EmployeeSpec()
 class Repository:
     def __init__(self):
         self.data = []
@@ -29,21 +30,25 @@ class Repository:
 
     def create(self, employee):
 
-
-        PartitionKey = employee.id
-
         employee_exist = container.read_all_items()
         for item in employee_exist:
             if item['id'] == employee.id:
                  print("Document already exists")
                  return
         try:
-            container.create_item(body=employee.__dict__)
+            if employee_spec.isSatifiesBy(employee):
+               container.create_item(body=employee.__dict__)
+               print("Document inserted successfully!")
+            else:
+                print("Invalid document")
+                return
+
         except:
             print("Something went wrong ${employee.__dict__}")
             pass
 
-        print("Document inserted successfully!")
+        return
+
     def read(self):
         data = container.read_all_items()
         for item in data:
