@@ -16,17 +16,32 @@ class Repository:
 
         # Create a Cosmos DB client
 
+
+    def read_by_id(self, id):
+        try:
+            document = container.read_item(item=id, partition_key=id)
+            return document
+        except:
+            print("Document does not exist")
+            pass
+
+
+
     def create(self, employee):
 
-        
+
         PartitionKey = employee.id
-        #value = container.read_item(item=employee.id, partition_key=PartitionKey)
+
         employee_exist = container.read_all_items()
         for item in employee_exist:
             if item['id'] == employee.id:
                  print("Document already exists")
                  return
-        container.create_item(body=employee.__dict__)
+        try:
+            container.create_item(body=employee.__dict__)
+        except:
+            print("Something went wrong ${employee.__dict__}")
+            pass
 
         print("Document inserted successfully!")
     def read(self):
@@ -37,13 +52,18 @@ class Repository:
         return self.data
 
     def update(self, id, employee):
+        try:
+            container.replace_item(item=id, body=employee.__dict__)
+            print("Document updated successfully!")
+        except:
+            print("Document does not exist")
 
-        container.replace_item(item=employee.id, body=employee.__dict__)
-        print("Document updated successfully!")
 
     def delete(self, id):
-        container.delete_item(id,id)
-        print("Document deleted successfully!")
-# Employee class
+        try:
+            container.delete_item(id,id)
+            print("Document deleted successfully!")
+        except:
+            print("Document does not exist")
 
-# Example usage
+
