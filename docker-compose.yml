@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  pythoncosmosdb:
+    image: pythoncosmosdb
+    build:
+      context: .
+      dockerfile: ./Dockerfile

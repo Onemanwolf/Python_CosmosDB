@@ -1,0 +1,40 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "docker-build",
+			"label": "docker-build",
+			"platform": "python",
+			"dockerBuild": {
+				"tag": "cosmos-db:v1.0.0",
+				"dockerfile": "${workspaceFolder}/Dockerfile",
+				"context": "${workspaceFolder}",
+				"pull": true
+			}
+		},
+		{
+			"type": "docker-run",
+			"label": "docker-run: debug",
+			"dependsOn": [
+				"docker-build"
+			],
+			"dockerRun": {
+				"containerName": "cosmos-db",
+				"image": "cosmos-db:v1.0.0",
+
+				"volumes": [
+					{ "localRoot": "${workspaceFolder}",
+					  "localPath": "${workspaceFolder}/src",
+				      "containerPath": "/src/app"}
+				],
+				"envFiles": ["${workspaceFolder}/src/.env" ],
+
+
+			},
+
+			"python": {
+				"file": "src/app.py"
+			}
+		}
+	]
+}

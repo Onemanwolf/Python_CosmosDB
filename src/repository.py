@@ -36,6 +36,7 @@ class Repository:
         for item in employee_exist:
             if item["id"] == employee.id:
                 print("Document already exists")
+               
                 return
         try:
             if self.employee_spec.isSatifiesBy(employee):
